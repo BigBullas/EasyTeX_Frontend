@@ -10,7 +10,8 @@ import styles from './EditorPage.module.scss';
 import { Note, Snippet } from '../../api/Api';
 import { api } from '../../api';
 import { useParams } from 'react-router-dom';
-import { Menu, Dropdown } from 'antd';
+import { Menu, Dropdown, Divider, List } from 'antd';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 console.log(styles);
 
@@ -40,13 +41,14 @@ const EditorPage: React.FC<Props> = ({
   const [cursorPosition, setCursorPosition] = useState(0);
   const [currentKeyContextMenu, setCurrentKeyContextMenu] = useState('');
 
-  const [isSnippetsMenu, setIsSnippetsMenu] = useState(false);
-  const [snippetsIndex, setSnippetsIndex] = useState(0);
+  // const [isSnippetsMenu, setIsSnippetsMenu] = useState(false);
+  // const [snippetsIndex, setSnippetsIndex] = useState(0);
   const [snippetsContextMenu, setSnippetsContextMenu] = useState<JSX.Element>(
     <></>,
   );
 
-  console.log(snippetsContextMenu);
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const currentHref = window.location.href;
   const hasNote = currentHref.includes('/note/');
@@ -76,6 +78,7 @@ const EditorPage: React.FC<Props> = ({
 
   useEffect(() => {
     setSnippetsContextMenu(createSnippetsMenu());
+    console.log(snippetsContextMenu);
   }, [snippets]);
 
   const requestOnNote = async () => {
@@ -99,19 +102,61 @@ const EditorPage: React.FC<Props> = ({
       return note;
     });
 
+    // if (value && String(value)[value.length - 1] === '/') {
+    //   setIsSnippetsMenu(true);
+    //   setSnippetsIndex(value.length - 1);
+    //   console.log('isSnippetMenu');
+    // } else {
+    //   if (
+    //     value &&
+    //     isSnippetsMenu &&
+    //     (value?.length < snippetsIndex || value.length - snippetsIndex > 5)
+    //   ) {
+    //     setIsSnippetsMenu(false);
+    //     console.log('off SnippetMenu');
+    //   }
+    // }
+  };
+
+  const handleClickSnippet = (event: React.MouseEvent) => {
+    console.log(event);
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Проверяем, содержит ли введенный текст символ '@'
+    // console.log(e.target.value);
+    // @ts-ignore
+
+    const value = e.target.value;
+
     if (value && String(value)[value.length - 1] === '/') {
-      setIsSnippetsMenu(true);
-      setSnippetsIndex(value.length - 1);
-      console.log('isSnippetMenu');
+      // Получаем позицию курсора в тексте
+      // @ts-ignore
+      const cursorPosition = e.target.selectionStart;
+      // Получаем координаты курсора
+      // @ts-ignore
+      const rect = e.target.getBoundingClientRect();
+      const x = rect.left + (cursorPosition + 1) * 7;
+      const y = rect.top;
+
+      const message = document.createElement('div');
+      // для стилей лучше было бы использовать css-класс здесь
+      message.style.cssText = 'position:fixed; color: red; z-index:1000';
+
+      // устанавливаем координаты элементу, не забываем про "px"!
+
+      message.style.left = x + 'px';
+      message.style.top = y + 'px';
+
+      message.innerHTML = 'adfasdfasdfasdf';
+      document.body.append(message);
+      // const x = rect.left + window.scrollX + cursorPosition * 8; // Приблизительное значение ширины символа
+      // const y = rect.top + window.scrollY;
+      console.log('asdf', cursorPosition, x, y);
+      setPosition({ x, y });
+      setVisible(true);
     } else {
-      if (
-        value &&
-        isSnippetsMenu &&
-        (value?.length < snippetsIndex || value.length - snippetsIndex > 5)
-      ) {
-        setIsSnippetsMenu(false);
-        console.log('off SnippetMenu');
-      }
+      setVisible(false);
     }
   };
 
@@ -170,23 +215,56 @@ const EditorPage: React.FC<Props> = ({
 
   const createSnippetsMenu = () => {
     return (
-      <Menu
-        style={{ width: '320px', height: '350px' }}
-        onClick={({ key }) => {
-          handleClickInContextMenu(key);
-        }}
-        items={snippets.map((item) => {
-          return {
-            label: (
-              <div>
-                <p>{item.name}</p>
-                <p>{item.description}</p>
-              </div>
-            ),
-            key: item.snippetId,
-          };
-        })}
-      ></Menu>
+      <>
+        {/* <Menu
+          style={{ width: '320px', height: '350px' }}
+          onClick={({ key }) => {
+            handleClickInContextMenu(key);
+          }}
+          items={snippets.map((item) => {
+            return {
+              label: (
+                <div>
+                  <p>{item.name}</p>
+                  <p>{item.description}</p>
+                </div>
+              ),
+              key: item.snippetId,
+            };
+          })}
+        ></Menu> */}
+        <InfiniteScroll
+          style={{
+            width: '250px',
+            height: '300px',
+            textAlign: 'left',
+            border: '1px solid gray',
+          }}
+          dataLength={snippets.length}
+          next={() => {}}
+          hasMore={snippets.length < 50}
+          endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+          scrollableTarget="scrollableDiv"
+          loader={undefined}
+        >
+          <List
+            style={{ paddingLeft: '1em' }}
+            dataSource={snippets}
+            renderItem={(item) => (
+              <List.Item
+                key={item.snippetId}
+                style={{ padding: 0 }}
+                onClick={handleClickSnippet}
+              >
+                <List.Item.Meta
+                  title={item.name}
+                  description={item.description}
+                />
+              </List.Item>
+            )}
+          />
+        </InfiniteScroll>
+      </>
     );
   };
 
@@ -223,12 +301,45 @@ const EditorPage: React.FC<Props> = ({
         {currentNoteId === -1 && <h2>Предварительный вид документа</h2>}
         <div className={styles.editor} data-color-mode="light">
           {/* {snippetsContextMenu} */}
+          {
+            visible && (
+              <div
+                style={{
+                  position: 'fixed',
+                  left: `${position.x}px`,
+                  top: `${position.y}px`,
+                  backgroundColor: 'white',
+                  border: '1px solid #ccc',
+                  padding: '10px',
+                  zIndex: 1000,
+                }}
+              >
+                {snippetsContextMenu}
+              </div>
+            )
+
+            // <div
+            //   style={{
+            //     position: 'absolute',
+            //     left: `${position.x}px`,
+            //     top: `${position.y}px`,
+            //     backgroundColor: 'white',
+            //     border: '1px solid #ccc',
+            //     padding: '10px',
+            //     zIndex: 1000,
+            //   }}
+            // >
+            //   asdfasdf
+            //   {/* {snippetsContextMenu} */}
+            // </div>
+          }
           <Dropdown overlay={menu} trigger={['contextMenu']}>
             <MDEditor
               value={noteText}
               height={800}
               onChange={handleChangeText}
               onContextMenu={handleContextMenuOnEditor}
+              onKeyUp={handleKeyUp}
               preview="preview"
               textareaProps={{
                 readOnly: currentNoteId === 25 ? true : false,

@@ -153,6 +153,27 @@ const CustomHeader: React.FC<Props> = ({
     navigate('/');
   };
 
+  const handleClickExportNote = async (event: React.MouseEvent) => {
+    event.preventDefault();
+
+    const response = await api.notes.downloadMdDetail(currentNote.noteId ?? 0);
+    console.log(response.data);
+
+    // // Создаем Blob из полученных данных с типом MIME для Markdown
+    const blob = new Blob([response.data], { type: 'text/markdown' });
+
+    // // Создаем URL для Blob
+    const url = URL.createObjectURL(blob);
+
+    // // Создаем элемент <a> для загрузки файла
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = currentNote.name + '.md' ?? 'Новый файл.md'; // Имя файла с расширением .md
+    // document.body.appendChild(link); // Добавляем элемент в DOM
+    link.click(); // Инициируем загрузку
+    // document.body.removeChild(link); // Удаляем элемент из DOM
+  };
+
   return (
     <Header className={styles.headerStyle}>
       <div className={styles.headerLeft}>
@@ -200,7 +221,10 @@ const CustomHeader: React.FC<Props> = ({
                 />
               </div>
               <div>
-                <ExportOutlined style={{ fontSize: '20px' }} />
+                <ExportOutlined
+                  style={{ fontSize: '20px' }}
+                  onClick={handleClickExportNote}
+                />
               </div>
             </div>
             <div className={styles.buttonContainer}>

@@ -468,6 +468,36 @@ export class Api<
      * No description
      *
      * @tags notes
+     * @name DownloadMdDetail
+     * @summary Получение заметки в виде md файла
+     * @request GET:/notes/{noteId}/download/md
+     */
+    downloadMdDetail: (noteId: number, params: RequestParams = {}) =>
+      this.request<File, Error>({
+        path: `/notes/${noteId}/download/md`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags notes
+     * @name DownloadPdfDetail
+     * @summary Получение заметки в виде pdf файла
+     * @request GET:/notes/{noteId}/download/pdf
+     */
+    downloadPdfDetail: (noteId: number, params: RequestParams = {}) =>
+      this.request<File, Error>({
+        path: `/notes/${noteId}/download/pdf`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags notes
      * @name SearchCreate
      * @summary Поиск заметок
      * @request POST:/notes/search
@@ -643,6 +673,34 @@ export class Api<
         Error
       >({
         path: `/recognizer/text`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags recognizer
+     * @name PostRecognizer
+     * @request POST:/recognizer/pdf
+     */
+    postRecognizer: (
+      data: {
+        /** @format binary */
+        data?: File;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          text?: string;
+        },
+        Error
+      >({
+        path: `/recognizer/pdf`,
         method: 'POST',
         body: data,
         type: ContentType.FormData,

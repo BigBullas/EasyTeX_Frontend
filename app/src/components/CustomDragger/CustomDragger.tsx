@@ -26,13 +26,15 @@ const CustomDragger: React.FC<Props> = ({
   sendFormData,
 }) => {
   const props: UploadProps = {
-    name: 'images',
+    name: isImage ? 'images' : 'data',
     multiple: false,
-    accept: isImage ? 'image/*' : '.mk,.docx,.pdf',
+    accept: isImage ? 'image/*' : '.md,.pdf',
     maxCount: 1,
     customRequest: async (info) => {
       const formData = new FormData();
-      formData.append('images', info.file);
+      isImage
+        ? formData.append('images', info.file)
+        : formData.append('data', info.file);
       try {
         await sendFormData(formData);
         if (info.onSuccess) {

@@ -4,8 +4,8 @@ import { Note } from '../../api/Api';
 import { api } from '../../api';
 import { useNavigate } from 'react-router-dom';
 import {
-  DownloadOutlined,
   FileImageOutlined,
+  ImportOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { Button } from 'antd';
@@ -101,21 +101,26 @@ const CreationPage: React.FC<Props> = ({
 
   async function sendFormData(formData: FormData) {
     try {
-      const response = await fetch(
-        'https://smartlectures.ru/api/v1/recognizer/mixed',
-        {
-          method: 'POST',
-          body: formData,
-        },
-      );
+      // const axiosResponse = await api.recognizer.
+      const response = isImageDragger
+        ? await fetch('https://smartlectures.ru/api/v1/recognizer/mixed', {
+            method: 'POST',
+            body: formData,
+          })
+        : await fetch('https://smartlectures.ru/api/v1/recognizer/pdf', {
+            method: 'POST',
+            body: formData,
+          });
       const text = await response.json();
       console.log(text.text);
+
       const newNote: Note = {};
       newNote.body = text.text;
       newNote.parentDir = 0;
       newNote.userId = 1;
       newNote.noteId = 0;
       setNote(newNote);
+
       navigate('/note/0');
     } catch (error) {
       console.error('There was a problem with your fetch operation:', error);
@@ -166,7 +171,7 @@ const CreationPage: React.FC<Props> = ({
                   ? 'primary'
                   : 'default'
               }
-              icon={<DownloadOutlined />}
+              icon={<ImportOutlined />}
               size={size}
               onClick={handleClickImportFiles}
             >
