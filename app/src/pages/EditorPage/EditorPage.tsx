@@ -139,17 +139,6 @@ const EditorPage: React.FC<Props> = ({
       const x = rect.left + (cursorPosition + 1) * 7;
       const y = rect.top;
 
-      const message = document.createElement('div');
-      // для стилей лучше было бы использовать css-класс здесь
-      message.style.cssText = 'position:fixed; color: red; z-index:1000';
-
-      // устанавливаем координаты элементу, не забываем про "px"!
-
-      message.style.left = x + 'px';
-      message.style.top = y + 'px';
-
-      message.innerHTML = 'adfasdfasdfasdf';
-      document.body.append(message);
       // const x = rect.left + window.scrollX + cursorPosition * 8; // Приблизительное значение ширины символа
       // const y = rect.top + window.scrollY;
       console.log('asdf', cursorPosition, x, y);
@@ -216,29 +205,11 @@ const EditorPage: React.FC<Props> = ({
   const createSnippetsMenu = () => {
     return (
       <>
-        {/* <Menu
-          style={{ width: '320px', height: '350px' }}
-          onClick={({ key }) => {
-            handleClickInContextMenu(key);
-          }}
-          items={snippets.map((item) => {
-            return {
-              label: (
-                <div>
-                  <p>{item.name}</p>
-                  <p>{item.description}</p>
-                </div>
-              ),
-              key: item.snippetId,
-            };
-          })}
-        ></Menu> */}
         <InfiniteScroll
           style={{
             width: '250px',
             height: '300px',
             textAlign: 'left',
-            border: '1px solid gray',
           }}
           dataLength={snippets.length}
           next={() => {}}
@@ -301,38 +272,20 @@ const EditorPage: React.FC<Props> = ({
         {currentNoteId === -1 && <h2>Предварительный вид документа</h2>}
         <div className={styles.editor} data-color-mode="light">
           {/* {snippetsContextMenu} */}
-          {
-            visible && (
-              <div
-                style={{
-                  position: 'fixed',
-                  left: `${position.x}px`,
-                  top: `${position.y}px`,
-                  backgroundColor: 'white',
-                  border: '1px solid #ccc',
-                  padding: '10px',
-                  zIndex: 1000,
-                }}
-              >
-                {snippetsContextMenu}
-              </div>
-            )
-
-            // <div
-            //   style={{
-            //     position: 'absolute',
-            //     left: `${position.x}px`,
-            //     top: `${position.y}px`,
-            //     backgroundColor: 'white',
-            //     border: '1px solid #ccc',
-            //     padding: '10px',
-            //     zIndex: 1000,
-            //   }}
-            // >
-            //   asdfasdf
-            //   {/* {snippetsContextMenu} */}
-            // </div>
-          }
+          {visible && (
+            <div
+              style={{
+                position: 'fixed',
+                left: `${position.x}px`,
+                top: `${position.y}px`,
+                backgroundColor: 'white',
+                border: '1px solid #ccc',
+                zIndex: 1000,
+              }}
+            >
+              {snippetsContextMenu}
+            </div>
+          )}
           <Dropdown overlay={menu} trigger={['contextMenu']}>
             <MDEditor
               value={noteText}
