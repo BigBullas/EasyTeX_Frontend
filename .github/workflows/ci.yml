@@ -1,0 +1,48 @@
+---
+name: Frontend pipeline
+on:
+  push:
+    branches: [main]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Build app
+        run: |
+          npm install
+          npm run build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+    needs: [lint]
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: copy file via ssh key
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.KEY }}
+          source: "tests/a.txt,tests/b.txt"
+          target: /home/ubuntu/smartlectures/
+    needs: [build]
