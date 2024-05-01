@@ -168,7 +168,7 @@ const CustomHeader: React.FC<Props> = ({
     // // Создаем элемент <a> для загрузки файла
     const link = document.createElement('a');
     link.href = url;
-    link.download = currentNote.name + '.md' ?? 'Новый файл.md'; // Имя файла с расширением .md
+    link.download = (currentNote.name ?? 'Новый файл') + '.md'; // Имя файла с расширением .md
     // document.body.appendChild(link); // Добавляем элемент в DOM
     link.click(); // Инициируем загрузку
     // document.body.removeChild(link); // Удаляем элемент из DOM

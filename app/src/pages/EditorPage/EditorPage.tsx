@@ -12,6 +12,7 @@ import { api } from '../../api';
 import { useParams } from 'react-router-dom';
 import { Menu, Dropdown, Divider, List } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { PreviewType } from '@uiw/react-md-editor';
 
 console.log(styles);
 
@@ -37,6 +38,8 @@ const EditorPage: React.FC<Props> = ({
   const inputForContextMenu = useRef<HTMLInputElement | null>(null);
 
   const [noteText, setNoteText] = useState<string | undefined>(note.body);
+
+  const [editorMode, setEditorMode] = useState<PreviewType>('preview');
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [currentKeyContextMenu, setCurrentKeyContextMenu] = useState('');
@@ -66,6 +69,53 @@ const EditorPage: React.FC<Props> = ({
     }
   }
 
+  const addHandleToClickOnPreview = () => {
+    const previewEditor = document.querySelector('.w-md-editor-preview');
+
+    if (previewEditor === null) {
+      setTimeout(addHandleToClickOnPreview, 1);
+    }
+
+    previewEditor?.addEventListener('click', () => {
+      if (editorMode === 'preview') {
+        setEditorMode('live');
+      }
+    });
+  };
+
+  useEffect(() => {
+    addHandleToClickOnPreview();
+
+    const previewButton = document.querySelector('[data-name="preview"]');
+
+    previewButton?.addEventListener('click', (event) => {
+      event.stopImmediatePropagation();
+
+      setEditorMode('preview');
+      addHandleToClickOnPreview();
+    });
+
+    const liveButton = document.querySelector('[data-name="live"]');
+
+    liveButton?.addEventListener('click', (event) => {
+      event.stopImmediatePropagation();
+
+      if (editorMode !== 'live') {
+        setEditorMode('live');
+      }
+    });
+
+    const editButton = document.querySelector('[data-name="edit"]');
+
+    editButton?.addEventListener('click', (event) => {
+      event.stopImmediatePropagation();
+
+      if (editorMode !== 'edit') {
+        setEditorMode('edit');
+      }
+    });
+  }, []);
+
   useEffect(() => {
     if (currentNoteId > 0) {
       requestOnNote();
@@ -78,7 +128,6 @@ const EditorPage: React.FC<Props> = ({
 
   useEffect(() => {
     setSnippetsContextMenu(createSnippetsMenu());
-    console.log(snippetsContextMenu);
   }, [snippets]);
 
   const requestOnNote = async () => {
@@ -119,14 +168,13 @@ const EditorPage: React.FC<Props> = ({
   };
 
   const handleClickSnippet = (event: React.MouseEvent) => {
-    console.log(event);
+    // @ts-ignore
+    const clickedSnippetsId = Number(event.target.attributes[0].value.at(-1));
+    setNoteText(snippets[clickedSnippetsId].body);
   };
 
   const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    // Проверяем, содержит ли введенный текст символ '@'
-    // console.log(e.target.value);
     // @ts-ignore
-
     const value = e.target.value;
 
     if (value && String(value)[value.length - 1] === '/') {
@@ -141,7 +189,6 @@ const EditorPage: React.FC<Props> = ({
 
       // const x = rect.left + window.scrollX + cursorPosition * 8; // Приблизительное значение ширины символа
       // const y = rect.top + window.scrollY;
-      console.log('asdf', cursorPosition, x, y);
       setPosition({ x, y });
       setVisible(true);
     } else {
@@ -221,10 +268,12 @@ const EditorPage: React.FC<Props> = ({
           <List
             style={{ paddingLeft: '1em' }}
             dataSource={snippets}
+            className={styles.snippet_menu}
             renderItem={(item) => (
               <List.Item
                 key={item.snippetId}
-                style={{ padding: 0 }}
+                className={`${item.snippetId}`}
+                style={{ padding: 0, cursor: 'pointer' }}
                 onClick={handleClickSnippet}
               >
                 <List.Item.Meta
@@ -269,7 +318,6 @@ const EditorPage: React.FC<Props> = ({
         <CustomBreadcrumb />
       </div>
       <>
-        {currentNoteId === -1 && <h2>Предварительный вид документа</h2>}
         <div className={styles.editor} data-color-mode="light">
           {/* {snippetsContextMenu} */}
           {visible && (
@@ -293,7 +341,7 @@ const EditorPage: React.FC<Props> = ({
               onChange={handleChangeText}
               onContextMenu={handleContextMenuOnEditor}
               onKeyUp={handleKeyUp}
-              preview="preview"
+              preview={editorMode}
               textareaProps={{
                 readOnly: currentNoteId === 25 ? true : false,
               }}
@@ -346,13 +394,14 @@ const EditorPage: React.FC<Props> = ({
               }}
             />
           </Dropdown>
-          <input
-            type="file"
-            ref={inputForContextMenu}
-            style={{ display: 'none' }}
-            onChange={handleChangeInputForContextMenu}
-          ></input>
         </div>
+
+        <input
+          type="file"
+          ref={inputForContextMenu}
+          style={{ display: 'none' }}
+          onChange={handleChangeInputForContextMenu}
+        ></input>
       </>
     </div>
   );

@@ -1,32 +1,3 @@
-// .app {
-//   text-align: center;
-// }
-
-// .logo {
-//   animation: logoSpin infinite 20s linear;
-//   height: 80px;
-// }
-
-// .header {
-//   background-color: #222;
-//   height: 150px;
-//   padding: 20px;
-//   color: white;
-// }
-
-// .intro {
-//   font-size: large;
-// }
-
-// @keyframes logoSpin {
-//   from {
-//     transform: rotate(0deg);
-//   }
-//   to {
-//     transform: rotate(360deg);
-//   }
-// }
-
 .editor {
   height: 800px;
 }
@@ -39,4 +10,19 @@ h2 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1em;
+}
+
+.snippet_menu {
+  li {
+    div {
+      pointer-events: none;
+      div {
+        pointer-events: none;
+        h4,
+        div {
+          pointer-events: none;
+        }
+      }
+    }
+  }
 }
