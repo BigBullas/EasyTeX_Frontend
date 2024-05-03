@@ -77,7 +77,7 @@ const CustomFindContainer: React.FC<Props> = ({ findValue }) => {
 
   useEffect(() => {
     setActiveFindList(findList.map((item) => item.noteId));
-  }, []);
+  }, [findList]);
 
   return (
     <div>

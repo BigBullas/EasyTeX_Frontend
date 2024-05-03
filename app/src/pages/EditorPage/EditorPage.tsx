@@ -170,7 +170,26 @@ const EditorPage: React.FC<Props> = ({
   const handleClickSnippet = (event: React.MouseEvent) => {
     // @ts-ignore
     const clickedSnippetsId = Number(event.target.attributes[0].value.at(-1));
-    setNoteText(snippets[clickedSnippetsId].body);
+
+    // повторяется код в 3 местах
+    let currentText = noteText;
+    currentText += snippets[clickedSnippetsId - 1].body;
+    // const lastIndex = currentText?.lastIndexOf('/');
+    // console.log(lastIndex);
+    // if (lastIndex == currentText?.length) {
+    //   currentText += snippets[clickedSnippetsId - 1].body;
+    // } else {
+    //   currentText =
+    //     currentText?.substring(0, lastIndex) +
+    //     snippets[clickedSnippetsId - 1].body +
+    //     currentText?.substring(lastIndex ?? 0, currentText.length);
+    // }
+
+    setNoteText(currentText);
+    setNote((note: Note) => {
+      note.body = String(currentText);
+      return note;
+    });
   };
 
   const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -210,30 +229,56 @@ const EditorPage: React.FC<Props> = ({
 
   async function sendFormData(formData: FormData) {
     try {
-      console.log(currentKeyContextMenu);
-      const response = await fetch(
-        'https://smartlectures.ru/api/v1/recognizer/mixed',
-        {
-          method: 'POST',
-          body: formData,
-        },
-      );
-      const receivedData = await response.json();
-      console.log(receivedData.text);
-      let currentText = noteText;
-      if (cursorPosition == currentText?.length) {
-        currentText += receivedData.text;
+      if (currentKeyContextMenu === 'addImage') {
+        const response = await fetch(
+          'https://smartlectures.ru/api/v1/images/upload',
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+
+        const receivedData = await response.json();
+
+        let currentText = noteText;
+        if (cursorPosition == currentText?.length) {
+          currentText += `  ![image](${receivedData.src})`;
+        } else {
+          currentText =
+            currentText?.substring(0, cursorPosition) +
+            `  ![image](${receivedData.src})` +
+            currentText?.substring(cursorPosition, currentText.length);
+        }
+        setNoteText(currentText);
+        setNote((note: Note) => {
+          note.body = String(currentText);
+          return note;
+        });
       } else {
-        currentText =
-          currentText?.substring(0, cursorPosition) +
-          receivedData.text +
-          currentText?.substring(cursorPosition, currentText.length);
+        const response = await fetch(
+          'https://smartlectures.ru/api/v1/recognizer/mixed',
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+        const receivedData = await response.json();
+        console.log(receivedData.text);
+        let currentText = noteText;
+        if (cursorPosition == currentText?.length) {
+          currentText += receivedData.text;
+        } else {
+          currentText =
+            currentText?.substring(0, cursorPosition) +
+            receivedData.text +
+            currentText?.substring(cursorPosition, currentText.length);
+        }
+        setNoteText(currentText);
+        setNote((note: Note) => {
+          note.body = String(currentText);
+          return note;
+        });
       }
-      setNoteText(currentText);
-      setNote((note: Note) => {
-        note.body = String(currentText);
-        return note;
-      });
     } catch (error) {
       console.error('There was a problem with your fetch operation:', error);
     }
@@ -342,9 +387,6 @@ const EditorPage: React.FC<Props> = ({
               onContextMenu={handleContextMenuOnEditor}
               onKeyUp={handleKeyUp}
               preview={editorMode}
-              textareaProps={{
-                readOnly: currentNoteId === 25 ? true : false,
-              }}
               previewOptions={{
                 components: {
                   code: ({ children = [], className, ...props }) => {
