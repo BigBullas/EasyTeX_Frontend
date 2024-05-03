@@ -1,6 +1,14 @@
 .markedText {
+  text-align: left;
+  // white-space: nowrap; /* Запрещаем перенос строк */
+  overflow: hidden; /* Обрезаем все, что не помещается в область */
+  text-overflow: ellipsis; /* Добавляем многоточие */
   em {
     background-color: #f9ea85;
     font-style: normal !important;
   }
+}
+
+.foundHeader {
+  font-size: medium;
 }

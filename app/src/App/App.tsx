@@ -98,7 +98,8 @@ const App: React.FC = () => {
                 </Routes>
                 <Layout>
                   <Resizable
-                    className="asdfasdf"
+                    maxWidth={'650px'}
+                    minWidth={'150px'}
                     defaultSize={{
                       width: '260px',
                       height: '100%',

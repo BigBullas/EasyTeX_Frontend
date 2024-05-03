@@ -11,6 +11,18 @@ body {
   height: 100%;
 }
 
+a {
+  text-decoration: none; /* Убирает подчеркивание */
+  color: inherit; /* Наследует цвет текста от родительского элемента */
+  background-color: transparent; /* Убирает фоновый цвет */
+}
+
+a:hover {
+  text-decoration: none; /* Убирает подчеркивание при наведении */
+  color: inherit; /* Наследует цвет текста при наведении */
+  background-color: transparent; /* Убирает фоновый цвет при наведении */
+}
+
 // :root {
 //   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 //   line-height: 1.5;

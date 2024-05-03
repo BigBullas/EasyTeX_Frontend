@@ -203,10 +203,8 @@ const EditorPage: React.FC<Props> = ({
   };
 
   const handleClickInContextMenu = (key: string) => {
-    if (key === 'pasteMix' || key === 'pasteText' || key === 'pasteMath') {
-      setCurrentKeyContextMenu(key);
-      inputForContextMenu.current?.click();
-    }
+    setCurrentKeyContextMenu(key);
+    inputForContextMenu.current?.click();
     console.log('click the key: ', key);
   };
 
@@ -220,15 +218,15 @@ const EditorPage: React.FC<Props> = ({
           body: formData,
         },
       );
-      const text = await response.json();
-      console.log(text.text);
+      const receivedData = await response.json();
+      console.log(receivedData.text);
       let currentText = noteText;
       if (cursorPosition == currentText?.length) {
-        currentText += text.text;
+        currentText += receivedData.text;
       } else {
         currentText =
           currentText?.substring(0, cursorPosition) +
-          text.text +
+          receivedData.text +
           currentText?.substring(cursorPosition, currentText.length);
       }
       setNoteText(currentText);
@@ -242,10 +240,12 @@ const EditorPage: React.FC<Props> = ({
   }
 
   const handleChangeInputForContextMenu = async (event: React.ChangeEvent) => {
-    console.log(event);
     const formData = new FormData();
-    // @ts-ignore
-    formData.append('images', event.target.files[0]);
+    formData.append(
+      currentKeyContextMenu === 'addImage' ? 'image' : 'images',
+      // @ts-ignore
+      event.target.files[0],
+    );
     await sendFormData(formData);
   };
 
@@ -398,6 +398,7 @@ const EditorPage: React.FC<Props> = ({
 
         <input
           type="file"
+          accept=".jpeg,.png,.svg"
           ref={inputForContextMenu}
           style={{ display: 'none' }}
           onChange={handleChangeInputForContextMenu}
