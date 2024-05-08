@@ -113,10 +113,11 @@ const CustomFindContainer: React.FC<Props> = ({ findValue }) => {
           if (!item.nameHighlight) {
             item.nameHighlight = [item.name];
           }
-          if (item.bodyHighlight.length > 0) {
+          if (item.bodyHighlight && item.bodyHighlight.length > 0) {
             return (
               <Panel
                 key={item.noteId}
+                className="asdfasdfasd"
                 header={
                   <Link to={`/note/${item.noteId}`}>
                     <div
@@ -154,6 +155,7 @@ const CustomFindContainer: React.FC<Props> = ({ findValue }) => {
           } else {
             return (
               <Panel
+                className="asdfasdfadfasd"
                 header={
                   <Link to={`/note/${item.noteId}`}>
                     <div
@@ -172,7 +174,7 @@ const CustomFindContainer: React.FC<Props> = ({ findValue }) => {
           }
         })}
       </Collapse>
-      {findList.length == 0 && (
+      {findList && findList.length == 0 && (
         <Empty
           description={'Ничего не найдено'}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
