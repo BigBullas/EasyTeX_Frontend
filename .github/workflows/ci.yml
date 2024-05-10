@@ -17,22 +17,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Build app
-        run: |
-          npm install
-          npm run build
+      - name: npm i
+        run: cd app && npm install
+      - name: npm build
+        run: cd app && npm run build
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist
+          path: ./app/dist
     needs: [lint]
   delivery:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Upload dist
-        uses: actions/upload-artifact@v4
+      - name: Download dist
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
@@ -43,8 +43,9 @@ jobs:
           username: ubuntu
           port: 22 
           key: ${{ secrets.MAIN_SSH_KEY }}
-          source: "dist"
-          target: /home/ubuntu/smartlectures/
+          source: dist/*
+          target: /home/ubuntu/smartlectures
+          overwrite: true
       - name: restart nginx
         uses: appleboy/ssh-action@v1.0.3
         with:
