@@ -2,7 +2,7 @@
 name: Frontend pipeline
 on:
   push:
-    branches: [ci]
+    branches: [main]
 jobs:
   lint:
     runs-on: ubuntu-latest
