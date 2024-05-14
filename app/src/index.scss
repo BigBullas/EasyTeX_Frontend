@@ -11,6 +11,10 @@ body {
   height: 100%;
 }
 
+body {
+  overflow: hidden;
+}
+
 a {
   text-decoration: none; /* Убирает подчеркивание */
   color: inherit; /* Наследует цвет текста от родительского элемента */

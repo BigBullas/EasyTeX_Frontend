@@ -5,7 +5,6 @@ import { getCodeString } from 'rehype-rewrite';
 import katex from 'katex';
 import 'katex/dist/katex.css';
 
-import CustomBreadcrumb from '../../components/CustomBreadcrumb';
 import styles from './EditorPage.module.scss';
 import { Note, Snippet } from '../../api/Api';
 import { api } from '../../api';
@@ -13,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import { Menu, Dropdown, Divider, List } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PreviewType } from '@uiw/react-md-editor';
+import CreateMirrorDivElement from '../../modules/FindSlashCooddinates';
 
 console.log(styles);
 
@@ -52,6 +52,9 @@ const EditorPage: React.FC<Props> = ({
 
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [findSlashFunc, setFindSlashFunc] = useState<
+    (() => { x: number; y: number }) | null
+  >(null);
 
   const currentHref = window.location.href;
   const hasNote = currentHref.includes('/note/');
@@ -73,7 +76,7 @@ const EditorPage: React.FC<Props> = ({
     const previewEditor = document.querySelector('.w-md-editor-preview');
 
     if (previewEditor === null) {
-      setTimeout(addHandleToClickOnPreview, 1);
+      setTimeout(addHandleToClickOnPreview, 0);
     }
 
     previewEditor?.addEventListener('click', () => {
@@ -81,6 +84,18 @@ const EditorPage: React.FC<Props> = ({
         setEditorMode('live');
       }
     });
+  };
+
+  const createTextareaMirror = () => {
+    const textareaContainer = document.querySelector('.w-md-editor-text');
+    const textarea = document.querySelector('.w-md-editor-text-input ');
+    if (textarea && textareaContainer) {
+      // console.log(CreateMirrorDivElement(textarea, textareaContainer));
+      setFindSlashFunc(CreateMirrorDivElement(textarea, textareaContainer));
+    } else {
+      console.log('Не успели отрисоваться');
+      setTimeout(createTextareaMirror, 0);
+    }
   };
 
   useEffect(() => {
@@ -117,6 +132,12 @@ const EditorPage: React.FC<Props> = ({
   }, []);
 
   useEffect(() => {
+    if (editorMode === 'live' || editorMode === 'edit') {
+      createTextareaMirror();
+    }
+  }, [editorMode]);
+
+  useEffect(() => {
     if (currentNoteId > 0) {
       requestOnNote();
     }
@@ -144,13 +165,21 @@ const EditorPage: React.FC<Props> = ({
   const handleChangeText = (
     value: React.SetStateAction<string | undefined>,
   ) => {
-    // console.log('handleChangeText_value: ', value);
     setNoteText(value);
     setNote((note: Note) => {
       note.body = String(value);
       return note;
     });
 
+    // if (value && String(value)[value.length - 1] === '/') {
+    //   console.log('123');
+    //   if (findSlashFunc) {
+    //     console.log('result: ', findSlashFunc);
+    //     // console.log('/', findSlashFunc());
+    //     setPosition(findSlashFunc);
+    //   }
+    //   setVisible(true);
+    // }
     // if (value && String(value)[value.length - 1] === '/') {
     //   setIsSnippetsMenu(true);
     //   setSnippetsIndex(value.length - 1);
@@ -196,20 +225,26 @@ const EditorPage: React.FC<Props> = ({
     // @ts-ignore
     const value = e.target.value;
 
+    // TODO: продумать логику нахождения нового /
+
     if (value && String(value)[value.length - 1] === '/') {
       // Получаем позицию курсора в тексте
       // @ts-ignore
-      const cursorPosition = e.target.selectionStart;
-      // Получаем координаты курсора
-      // @ts-ignore
-      const rect = e.target.getBoundingClientRect();
-      const x = rect.left + (cursorPosition + 1) * 7;
-      const y = rect.top;
+      // const cursorPosition = e.target.selectionStart;
+      // // Получаем координаты курсора
+      // // @ts-ignore
+      // const rect = e.target.getBoundingClientRect();
+      // const x = rect.left + (cursorPosition + 1) * 7;
+      // const y = rect.top;
 
       // const x = rect.left + window.scrollX + cursorPosition * 8; // Приблизительное значение ширины символа
       // const y = rect.top + window.scrollY;
-      setPosition({ x, y });
-      setVisible(true);
+      if (findSlashFunc) {
+        setPosition(findSlashFunc());
+        setVisible(true);
+      } else {
+        console.log('findSlashFunc is null');
+      }
     } else {
       setVisible(false);
     }
@@ -359,9 +394,6 @@ const EditorPage: React.FC<Props> = ({
   return (
     <div className="payload_list_container">
       {contextHolder}
-      <div style={{ paddingBottom: '2em' }}>
-        <CustomBreadcrumb />
-      </div>
       <>
         <div className={styles.editor} data-color-mode="light">
           {/* {snippetsContextMenu} */}
@@ -382,7 +414,7 @@ const EditorPage: React.FC<Props> = ({
           <Dropdown overlay={menu} trigger={['contextMenu']}>
             <MDEditor
               value={noteText}
-              height={800}
+              height={700}
               onChange={handleChangeText}
               onContextMenu={handleContextMenuOnEditor}
               onKeyUp={handleKeyUp}

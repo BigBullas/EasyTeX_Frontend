@@ -1,0 +1,40 @@
+.headerRight {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5em;
+
+  .documentTitle {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    // padding-left: 4.7em;
+    align-items: center;
+
+    .input {
+      border: none;
+    }
+  }
+
+  .documentInstruments {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+
+    .iconContainer {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .buttonContainer {
+      display: flex;
+      justify-content: left;
+      gap: 10px;
+      align-items: center;
+    }
+  }
+}

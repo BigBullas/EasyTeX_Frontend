@@ -139,9 +139,9 @@ const CreationPage: React.FC<Props> = ({
   return (
     <div className="payload_list_container">
       {contextHolder}
-      <div style={{ paddingBottom: '2em' }}>
+      {/* <div style={{ paddingBottom: '2em' }}>
         <CustomBreadcrumb />
-      </div>
+      </div> */}
 
       <>
         <div>

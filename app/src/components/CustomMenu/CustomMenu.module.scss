@@ -10,7 +10,14 @@
     }
     span {
       pointer-events: none;
+      print-color-adjust: none;
       // font-size: xx-large !important;
     }
   }
+}
+
+.scroll {
+  width: 100%;
+  flex-grow: 1;
+  overflow-y: auto;
 }

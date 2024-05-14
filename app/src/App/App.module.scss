@@ -15,11 +15,18 @@ contentStyle {
   background-color: '#0958d9';
 }
 
-siderStyle {
-  text-align: 'center';
-  line-height: '120px';
-  color: '#fff';
-  background-color: '#1677ff';
+.siderStyle {
+  text-align: center;
+  line-height: 120px;
+  color: black;
+  background-color: #ffffff !important;
+
+  height: 100%; /* Занимает всю высоту экрана */
+
+  > div {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 layoutStyle {

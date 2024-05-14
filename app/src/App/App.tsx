@@ -1,4 +1,4 @@
-// import classes from "./App.module.scss";
+import styles from './App.module.scss';
 import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Layout, Flex, message } from 'antd';
@@ -15,6 +15,8 @@ import EditorPage from '../pages/EditorPage';
 import CreationPage from '../pages/CreationPage';
 import CustomFindContainer from '../components/CustomFindContainer';
 import { api } from '../api';
+import HeaderInEditorPage from '../components/HeaderInEditorPage';
+// import CustomBreadcrumb from '../components/CustomBreadcrumb';
 
 const App: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -53,9 +55,17 @@ const App: React.FC = () => {
         <Route
           path="/*"
           element={
-            <Flex gap="middle" wrap="wrap" style={{ height: '100%' }}>
+            <Flex
+              gap="middle"
+              wrap="wrap"
+              style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
               <Layout style={layoutStyle}>
-                <Routes>
+                {/* <Routes>
                   <Route
                     path="/note/:id"
                     element={
@@ -95,8 +105,9 @@ const App: React.FC = () => {
                       ></CustomHeader>
                     }
                   />
-                </Routes>
-                <Layout>
+                </Routes> */}
+                <CustomHeader />
+                <Layout style={{ flexGrow: '1' }}>
                   <Resizable
                     maxWidth={'650px'}
                     minWidth={'150px'}
@@ -105,16 +116,22 @@ const App: React.FC = () => {
                       height: '100%',
                     }}
                   >
-                    <Sider style={siderStyle} width={'100%'}>
+                    <Sider className={styles.siderStyle} width={'100%'}>
+                      {/* вынести в отдельный компонент */}
                       <Search
                         placeholder="Поиск"
                         allowClear
                         onChange={handleChangeFindValue}
                         onSearch={handleEventFindValue}
                         value={findValue}
-                        style={{ width: '80%', margin: '1em 0' }}
+                        style={{
+                          width: '80%',
+                          margin: '1em 0',
+                          paddingLeft: '24px',
+                        }}
                       />
                       {!findValue ? (
+                        // поменять название на FolderMenu или меню иерархии
                         <CustomMenu
                           currentNote={currentNote}
                           setCurrentNote={setCurrentNote}
@@ -130,10 +147,12 @@ const App: React.FC = () => {
                   </Resizable>
 
                   <Content style={contentStyle}>
+                    {/* <CustomBreadcrumb /> */}
                     <Routes>
                       <Route
                         path="/"
                         element={
+                          // TODO: здесь будет новый компонент главной страницы
                           <EditorPage
                             isUpdateNoteAndDirList={isUpdateNoteAndDirList}
                             setIsUpdateNoteAndDirList={
@@ -164,17 +183,29 @@ const App: React.FC = () => {
                       <Route
                         path="/note/:id"
                         element={
-                          <EditorPage
-                            isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                            setIsUpdateNoteAndDirList={
-                              setIsUpdateNoteAndDirList
-                            }
-                            note={currentNote}
-                            setNote={setCurrentNote}
-                            snippets={snippets}
-                            setSnippets={setSnippets}
-                            contextHolder={contextHolder}
-                          ></EditorPage>
+                          <div>
+                            <HeaderInEditorPage
+                              isFullHeader={false}
+                              currentNote={currentNote}
+                              messageApi={messageApi}
+                              setCurrentNote={setCurrentNote}
+                              isUpdateNoteAndDirList={isUpdateNoteAndDirList}
+                              setIsUpdateNoteAndDirList={
+                                setIsUpdateNoteAndDirList
+                              }
+                            />
+                            <EditorPage
+                              isUpdateNoteAndDirList={isUpdateNoteAndDirList}
+                              setIsUpdateNoteAndDirList={
+                                setIsUpdateNoteAndDirList
+                              }
+                              note={currentNote}
+                              setNote={setCurrentNote}
+                              snippets={snippets}
+                              setSnippets={setSnippets}
+                              contextHolder={contextHolder}
+                            ></EditorPage>
+                          </div>
                         }
                       />
                       <Route
@@ -199,6 +230,8 @@ const App: React.FC = () => {
 
 export default App;
 
+// TODO: закинуть в scss файл
+
 const contentStyle: React.CSSProperties = {
   textAlign: 'center',
   minHeight: 120,
@@ -208,12 +241,12 @@ const contentStyle: React.CSSProperties = {
   padding: '2em 5em',
 };
 
-const siderStyle: React.CSSProperties = {
-  height: '100%',
-  textAlign: 'center',
-  color: '#black',
-  backgroundColor: '#FFFFFF',
-};
+// const siderStyle: React.CSSProperties = {
+//   height: '100%',
+//   textAlign: 'center',
+//   color: '#black',
+//   backgroundColor: '#FFFFFF',
+// };
 
 const layoutStyle = {
   overflow: 'hidden',

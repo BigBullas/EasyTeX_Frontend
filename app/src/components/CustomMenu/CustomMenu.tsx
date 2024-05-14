@@ -8,12 +8,13 @@ import {
   FolderOutlined,
 } from '@ant-design/icons';
 import type { MenuProps, MenuTheme } from 'antd';
-import { Dropdown, Menu } from 'antd';
+import { Divider, Dropdown, Menu } from 'antd';
 import { api } from '../../api';
 import { NotePreview, Dir, Note } from '../../api/Api';
 
 import styles from './CustomMenu.module.scss';
 import { useNavigate } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const createMenuStructure = (
   dirMap: Map<number, MenuItem>,
@@ -402,21 +403,71 @@ const CustomMenu: React.FC<Props> = ({
         checkedChildren="Dark"
         unCheckedChildren="Light"
       /> */}
-      <Dropdown overlay={menu} trigger={['contextMenu']}>
-        <Menu
-          theme={theme}
-          onClick={onClick}
-          onContextMenu={handleContextMenuOnNavbar}
-          style={{ textAlign: 'left' }}
-          defaultOpenKeys={[currentDirId]}
-          selectedKeys={[currentNoteId]}
-          mode="inline"
-          items={navbar}
-          className={styles.menu}
-        />
-      </Dropdown>
+      <div className={styles.scroll}>
+        <Dropdown overlay={menu} trigger={['contextMenu']}>
+          <Menu
+            theme={theme}
+            onClick={onClick}
+            onContextMenu={handleContextMenuOnNavbar}
+            style={{ textAlign: 'left' }}
+            defaultOpenKeys={[currentDirId]}
+            selectedKeys={[currentNoteId]}
+            mode="inline"
+            items={navbar}
+            className={styles.menu}
+          />
+        </Dropdown>
+      </div>
     </>
   );
 };
 
 export default CustomMenu;
+
+// Мок данные
+
+/**[
+    {
+      name: 'Новая папка',
+      dirId: 36,
+      userId: 1,
+      parentDir: 0,
+      iconUrl: '',
+    },
+    {
+      name: 'Новая папка(2)',
+      dirId: 38,
+      userId: 1,
+      parentDir: 0,
+      iconUrl: '',
+    },
+    {
+      name: 'Новая папка(2)',
+      dirId: 39,
+      userId: 1,
+      parentDir: 0,
+      iconUrl: '',
+      subdirs: [
+        {
+          name: 'Новая папка',
+          dirId: 40,
+          userId: 1,
+          parentDir: 39,
+          iconUrl: '',
+        },
+      ],
+    },
+  ] */
+
+/**[
+    { noteId: 126, name: '42345545', parentDir: 0 },
+    { noteId: 130, name: 'Новый файл(1)', parentDir: 0 },
+    { noteId: 133, name: 'Фурье лекция', parentDir: 0 },
+    { noteId: 134, name: 'Поиск тест2', parentDir: 0 },
+    { noteId: 131, name: 'Новый файл(1)', parentDir: 0 },
+    { noteId: 128, name: 'Фурье Поиск', parentDir: 0 },
+    { noteId: 127, name: 'Новый файл', parentDir: 0 },
+    { noteId: 129, name: 'Новый файл', parentDir: 36 },
+    { noteId: 132, name: 'Новый файл1231323123(1)', parentDir: 40 },
+    { noteId: 25, name: 'Введение в приложение', parentDir: 0 },
+  ] */
