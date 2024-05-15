@@ -61,7 +61,7 @@ const CreateMirrorDivElement = (
     // setPosition({ x: rect.right, y: rect.bottom });
     // setVisible(true);
 
-    return { x: rect.right, y: rect.bottom };
+    return { y: rect.y, right: rect.right, bottom: rect.bottom };
   };
 
   return () => findSlashCooddinates;

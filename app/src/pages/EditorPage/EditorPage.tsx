@@ -14,8 +14,6 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { PreviewType } from '@uiw/react-md-editor';
 import CreateMirrorDivElement from '../../modules/FindSlashCooddinates';
 
-console.log(styles);
-
 type Props = {
   note: Note;
   setNote: React.Dispatch<React.SetStateAction<Note>>;
@@ -29,13 +27,18 @@ type Props = {
   setIsUpdateNoteAndDirList: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+const snippetMenuSizes = {
+  width: 250,
+  height: 300,
+};
+
 const EditorPage: React.FC<Props> = ({
   note,
   setNote,
   snippets,
   contextHolder,
 }) => {
-  const inputForContextMenu = useRef<HTMLInputElement | null>(null);
+  const inputForContextMenuFile = useRef<HTMLInputElement | null>(null);
 
   const [noteText, setNoteText] = useState<string | undefined>(note.body);
 
@@ -52,8 +55,11 @@ const EditorPage: React.FC<Props> = ({
 
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [slashIndex, setSlashIndex] = useState(0);
+  const [snippetId, setSnippetId] = useState(0);
+
   const [findSlashFunc, setFindSlashFunc] = useState<
-    (() => { x: number; y: number }) | null
+    (() => { y: number; right: number; bottom: number }) | null
   >(null);
 
   const currentHref = window.location.href;
@@ -141,6 +147,8 @@ const EditorPage: React.FC<Props> = ({
     if (currentNoteId > 0) {
       requestOnNote();
     }
+    setPosition({ x: 0, y: 0 });
+    setVisible(false);
   }, [currentNoteId]);
 
   useEffect(() => {
@@ -150,6 +158,29 @@ const EditorPage: React.FC<Props> = ({
   useEffect(() => {
     setSnippetsContextMenu(createSnippetsMenu());
   }, [snippets]);
+
+  useEffect(() => {
+    if (snippetId === 0 || noteText == undefined || noteText == '') {
+      return;
+    }
+    // let currentText = noteText;
+    setNoteText(
+      noteText.slice(0, slashIndex) +
+        snippets[snippetId - 1].body +
+        ' ' +
+        noteText.slice(slashIndex + 1),
+    );
+    // currentText += snippets[snippetId - 1].body;
+    // setNoteText(currentText);
+    setSnippetId(0);
+  }, [snippetId]);
+
+  useEffect(() => {
+    return () => {
+      setPosition({ x: 0, y: 0 });
+      setVisible(false);
+    };
+  }, []);
 
   const requestOnNote = async () => {
     try {
@@ -170,77 +201,52 @@ const EditorPage: React.FC<Props> = ({
       note.body = String(value);
       return note;
     });
-
-    // if (value && String(value)[value.length - 1] === '/') {
-    //   console.log('123');
-    //   if (findSlashFunc) {
-    //     console.log('result: ', findSlashFunc);
-    //     // console.log('/', findSlashFunc());
-    //     setPosition(findSlashFunc);
-    //   }
-    //   setVisible(true);
-    // }
-    // if (value && String(value)[value.length - 1] === '/') {
-    //   setIsSnippetsMenu(true);
-    //   setSnippetsIndex(value.length - 1);
-    //   console.log('isSnippetMenu');
-    // } else {
-    //   if (
-    //     value &&
-    //     isSnippetsMenu &&
-    //     (value?.length < snippetsIndex || value.length - snippetsIndex > 5)
-    //   ) {
-    //     setIsSnippetsMenu(false);
-    //     console.log('off SnippetMenu');
-    //   }
-    // }
   };
 
   const handleClickSnippet = (event: React.MouseEvent) => {
     // @ts-ignore
     const clickedSnippetsId = Number(event.target.attributes[0].value.at(-1));
-
-    // повторяется код в 3 местах
-    let currentText = noteText;
-    currentText += snippets[clickedSnippetsId - 1].body;
-    // const lastIndex = currentText?.lastIndexOf('/');
-    // console.log(lastIndex);
-    // if (lastIndex == currentText?.length) {
-    //   currentText += snippets[clickedSnippetsId - 1].body;
-    // } else {
-    //   currentText =
-    //     currentText?.substring(0, lastIndex) +
-    //     snippets[clickedSnippetsId - 1].body +
-    //     currentText?.substring(lastIndex ?? 0, currentText.length);
-    // }
-
-    setNoteText(currentText);
-    setNote((note: Note) => {
-      note.body = String(currentText);
-      return note;
-    });
+    setSnippetId(clickedSnippetsId);
+    setVisible(false);
+    setPosition({ x: 0, y: 0 });
   };
 
   const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
     // @ts-ignore
     const value = e.target.value;
+    console.log(value, ' vs ', noteText);
+    // setNoteText(value);
 
     // TODO: продумать логику нахождения нового /
-
     if (value && String(value)[value.length - 1] === '/') {
-      // Получаем позицию курсора в тексте
-      // @ts-ignore
-      // const cursorPosition = e.target.selectionStart;
-      // // Получаем координаты курсора
-      // // @ts-ignore
-      // const rect = e.target.getBoundingClientRect();
-      // const x = rect.left + (cursorPosition + 1) * 7;
-      // const y = rect.top;
-
-      // const x = rect.left + window.scrollX + cursorPosition * 8; // Приблизительное значение ширины символа
-      // const y = rect.top + window.scrollY;
+      setSlashIndex(value.length - 1);
       if (findSlashFunc) {
-        setPosition(findSlashFunc());
+        const coords = findSlashFunc();
+        const futureContextMenuCoords = { x: 0, y: 0 };
+        if (
+          document.body.offsetHeight - coords.bottom <=
+          snippetMenuSizes.height
+        ) {
+          futureContextMenuCoords.y = coords.y - snippetMenuSizes.height;
+          console.log('снизу не помещается', futureContextMenuCoords);
+        } else {
+          futureContextMenuCoords.y = coords.bottom;
+          console.log('снизу помещается', futureContextMenuCoords);
+        }
+
+        if (
+          document.body.offsetWidth - coords.right <=
+          snippetMenuSizes.width
+        ) {
+          futureContextMenuCoords.x =
+            document.body.offsetWidth - snippetMenuSizes.width;
+          console.log('справа не помещается', futureContextMenuCoords);
+        } else {
+          futureContextMenuCoords.x = coords.right;
+          console.log('справа помещается', futureContextMenuCoords);
+        }
+
+        setPosition(futureContextMenuCoords);
         setVisible(true);
       } else {
         console.log('findSlashFunc is null');
@@ -258,7 +264,7 @@ const EditorPage: React.FC<Props> = ({
 
   const handleClickInContextMenu = (key: string) => {
     setCurrentKeyContextMenu(key);
-    inputForContextMenu.current?.click();
+    inputForContextMenuFile.current?.click();
     console.log('click the key: ', key);
   };
 
@@ -334,8 +340,8 @@ const EditorPage: React.FC<Props> = ({
       <>
         <InfiniteScroll
           style={{
-            width: '250px',
-            height: '300px',
+            width: snippetMenuSizes.width,
+            height: snippetMenuSizes.height,
             textAlign: 'left',
           }}
           dataLength={snippets.length}
@@ -390,6 +396,13 @@ const EditorPage: React.FC<Props> = ({
       ]}
     ></Menu>
   );
+
+  // TODO: поменять высоту редактора, чтобы был почти до конца экрана
+  // TODO: сохранять размеры (координаты правого нижнего угла) textarea
+  // TODO: опираться при отрисовке ContextMenu не body, а размеров textarea
+
+  //TODO: сделать остальные пункты по сниппетам, поиск
+  //TODO: авторизация, регистрация
 
   return (
     <div className="payload_list_container">
@@ -473,7 +486,7 @@ const EditorPage: React.FC<Props> = ({
         <input
           type="file"
           accept=".jpeg,.png,.svg"
-          ref={inputForContextMenu}
+          ref={inputForContextMenuFile}
           style={{ display: 'none' }}
           onChange={handleChangeInputForContextMenu}
         ></input>
@@ -483,3 +496,54 @@ const EditorPage: React.FC<Props> = ({
 };
 
 export default EditorPage;
+
+// на доработку логика возникновения меню сниппетов
+/**const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // @ts-ignore
+    const value = e.target.value;
+    const currentIndex = value.length - 1;
+    // setNoteText(value);
+
+    // TODO: продумать логику нахождения нового /
+    if (value && String(value).includes('/')) {
+      if (!slashArray.includes(currentIndex)) {
+        setSlashArray((prevIndexes) => [...prevIndexes, currentIndex]);
+        setSlashIndex(value.length - 1);
+        if (findSlashFunc) {
+          const coords = findSlashFunc();
+          const futureContextMenuCoords = { x: 0, y: 0 };
+          if (
+            document.body.offsetHeight - coords.bottom <=
+            snippetMenuSizes.height
+          ) {
+            futureContextMenuCoords.y = coords.y - snippetMenuSizes.height;
+            console.log('снизу не помещается', futureContextMenuCoords);
+          } else {
+            futureContextMenuCoords.y = coords.bottom;
+            console.log('снизу помещается', futureContextMenuCoords);
+          }
+
+          if (
+            document.body.offsetWidth - coords.right <=
+            snippetMenuSizes.width
+          ) {
+            futureContextMenuCoords.x =
+              document.body.offsetWidth - snippetMenuSizes.width;
+            console.log('справа не помещается', futureContextMenuCoords);
+          } else {
+            futureContextMenuCoords.x = coords.right;
+            console.log('справа помещается', futureContextMenuCoords);
+          }
+
+          setPosition(futureContextMenuCoords);
+          setVisible(true);
+        } else {
+          console.log('findSlashFunc is null');
+        }
+      } else {
+        setVisible(false);
+      }
+    } else {
+      setVisible(false);
+    }
+  }; */

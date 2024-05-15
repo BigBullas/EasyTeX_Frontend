@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import CustomBreadcrumb from '../../components/CustomBreadcrumb';
 import { Note } from '../../api/Api';
 import { api } from '../../api';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +26,6 @@ type Props = {
 };
 
 const CreationPage: React.FC<Props> = ({
-  note,
   setNote,
   contextHolder,
   isUpdateNoteAndDirList,
@@ -63,18 +61,11 @@ const CreationPage: React.FC<Props> = ({
   const handleClickCreateNote = async (event: React.MouseEvent) => {
     event.preventDefault();
     let newNote: Note = {};
-    if (note.name) {
-      newNote = {
-        userId: 1,
-        parentDir: 0,
-        name: note.name,
-      };
-    } else {
-      newNote = {
-        userId: 1,
-        parentDir: 0,
-      };
-    }
+
+    newNote = {
+      userId: 1,
+      parentDir: 0,
+    };
 
     try {
       const response = await api.notes.notesCreate(newNote);
