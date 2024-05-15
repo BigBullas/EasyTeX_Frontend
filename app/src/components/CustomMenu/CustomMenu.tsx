@@ -8,13 +8,12 @@ import {
   FolderOutlined,
 } from '@ant-design/icons';
 import type { MenuProps, MenuTheme } from 'antd';
-import { Divider, Dropdown, Menu } from 'antd';
+import { Dropdown, Menu } from 'antd';
 import { api } from '../../api';
 import { NotePreview, Dir, Note } from '../../api/Api';
 
 import styles from './CustomMenu.module.scss';
 import { useNavigate } from 'react-router-dom';
-import InfiniteScroll from 'react-infinite-scroll-component';
 
 const createMenuStructure = (
   dirMap: Map<number, MenuItem>,

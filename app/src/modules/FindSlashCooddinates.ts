@@ -1,3 +1,4 @@
+//@ts-nocheck
 import styles from './modules.module.scss';
 
 const CreateMirrorDivElement = (
