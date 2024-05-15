@@ -142,14 +142,12 @@ const EditorPage: React.FC<Props> = ({
       const snippetMenu = document.getElementById('snippetMenu');
       const contextMenu = document.getElementById('contextMenu');
 
-      if (visible) {
-        //@ts-ignore
-        if (!snippetMenu?.contains(e.target)) {
-          setVisible(false);
-          setPosition({ x: 0, y: 0 });
-        }
+      //@ts-ignore
+      if (!snippetMenu?.contains(e.target)) {
+        setVisible(false);
+        setPosition({ x: 0, y: 0 });
       }
-      console.log(isOpenContextMenu);
+
       //@ts-ignore
       if (!contextMenu?.contains(e.target)) {
         setIsOpenContextMenu(false);
