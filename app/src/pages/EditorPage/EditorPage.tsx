@@ -76,7 +76,7 @@ const EditorPage: React.FC<Props> = ({
     if (hasCreateNote) {
       currentNoteId = -1;
     } else {
-      currentNoteId = 25;
+      currentNoteId = 528;
     }
   }
 
@@ -430,7 +430,7 @@ const EditorPage: React.FC<Props> = ({
   //TODO: авторизация, регистрация
 
   return (
-    <div className="payload_list_container">
+    <div className="payload_list_container" style={{ flexGrow: '1' }}>
       {contextHolder}
       <>
         <div className={styles.editor} data-color-mode="light">
@@ -458,7 +458,7 @@ const EditorPage: React.FC<Props> = ({
           >
             <MDEditor
               value={noteText}
-              height={700}
+              height={'90%'}
               onChange={handleChangeText}
               onContextMenu={handleContextMenuOnEditor}
               onKeyUp={handleKeyUp}

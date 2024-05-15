@@ -183,7 +183,12 @@ const App: React.FC = () => {
                       <Route
                         path="/note/:id"
                         element={
-                          <div>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                            }}
+                          >
                             <HeaderInEditorPage
                               isFullHeader={false}
                               currentNote={currentNote}
@@ -237,8 +242,8 @@ const contentStyle: React.CSSProperties = {
   minHeight: 120,
   lineHeight: '100%',
   color: 'black',
-  backgroundColor: '#f0f2f5',
-  padding: '2em 5em',
+  // backgroundColor: '#f0f2f5',
+  margin: '1.5em 5em',
 };
 
 // const siderStyle: React.CSSProperties = {
