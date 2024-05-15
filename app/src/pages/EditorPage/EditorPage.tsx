@@ -53,6 +53,8 @@ const EditorPage: React.FC<Props> = ({
     <></>,
   );
 
+  const [isOpenContextMenu, setIsOpenContextMenu] = useState(false);
+
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [slashIndex, setSlashIndex] = useState(0);
@@ -135,6 +137,29 @@ const EditorPage: React.FC<Props> = ({
         setEditorMode('edit');
       }
     });
+
+    const checkClickOnSnippetMenu = (e: MouseEvent) => {
+      const snippetMenu = document.getElementById('snippetMenu');
+      const contextMenu = document.getElementById('contextMenu');
+
+      if (visible) {
+        //@ts-ignore
+        if (!snippetMenu?.contains(e.target)) {
+          setVisible(false);
+          setPosition({ x: 0, y: 0 });
+        }
+      }
+      console.log(isOpenContextMenu);
+      //@ts-ignore
+      if (!contextMenu?.contains(e.target)) {
+        setIsOpenContextMenu(false);
+      }
+    };
+
+    document.addEventListener('click', checkClickOnSnippetMenu);
+    return () => {
+      document.removeEventListener('click', checkClickOnSnippetMenu);
+    };
   }, []);
 
   useEffect(() => {
@@ -260,6 +285,7 @@ const EditorPage: React.FC<Props> = ({
     event.preventDefault();
     // @ts-ignore
     setCursorPosition(event.target.selectionStart);
+    setIsOpenContextMenu(true);
   };
 
   const handleClickInContextMenu = (key: string) => {
@@ -376,6 +402,7 @@ const EditorPage: React.FC<Props> = ({
 
   const menu = (
     <Menu
+      id="contextMenu"
       onClick={({ key }) => {
         handleClickInContextMenu(key);
       }}
@@ -412,6 +439,7 @@ const EditorPage: React.FC<Props> = ({
           {/* {snippetsContextMenu} */}
           {visible && (
             <div
+              id="snippetMenu"
               style={{
                 position: 'fixed',
                 left: `${position.x}px`,
@@ -424,7 +452,12 @@ const EditorPage: React.FC<Props> = ({
               {snippetsContextMenu}
             </div>
           )}
-          <Dropdown overlay={menu} trigger={['contextMenu']}>
+          <Dropdown
+            overlay={menu}
+            open={isOpenContextMenu}
+            onOpenChange={setIsOpenContextMenu}
+            trigger={['contextMenu']}
+          >
             <MDEditor
               value={noteText}
               height={700}
