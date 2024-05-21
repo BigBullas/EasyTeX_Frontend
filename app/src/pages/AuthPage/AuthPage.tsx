@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api';
 
 type Props = {
-  setIsAuthUser: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAuthUser: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   setIsFirstAuth: React.Dispatch<React.SetStateAction<boolean>>;
 };
 

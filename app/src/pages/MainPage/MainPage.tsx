@@ -20,10 +20,10 @@ import { User } from '../../types';
 console.log(styles);
 
 type Props = {
-  isAuth: boolean;
+  isAuth: boolean | undefined;
   isFirstAuth: boolean;
   user: User | undefined;
-  setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAuth: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
 };
 

@@ -4,7 +4,7 @@ import styles from './Lending.module.scss';
 console.log(styles);
 
 type Props = {
-  isAuth: boolean;
+  isAuth: boolean | undefined;
 };
 
 const Lending: React.FC<Props> = ({ isAuth }) => {

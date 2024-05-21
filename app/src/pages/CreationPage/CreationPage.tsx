@@ -80,6 +80,11 @@ const CreationPage: React.FC<Props> = ({
 
   const handleClickDownloadImages = (event: React.MouseEvent) => {
     event.preventDefault();
+
+    // const dragger = document.getElementById('dragger');
+    // if (dragger) {
+    //   dragger.click();
+    // }
     setIsActiveDragger(true);
     setIsImageDragger(true);
   };

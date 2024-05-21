@@ -65,7 +65,7 @@ const CustomDragger: React.FC<Props> = ({
   };
 
   return (
-    <Dragger {...props} disabled={!isActive}>
+    <Dragger id="dragger" {...props} disabled={!isActive}>
       <p className="ant-upload-drag-icon">
         <InboxOutlined />
       </p>

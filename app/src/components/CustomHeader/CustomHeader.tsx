@@ -29,7 +29,7 @@ console.log(styles);
 
 type Props = {
   user: User | undefined;
-  setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAuth: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 };
 
 const CustomHeader: React.FC<Props> = ({ user, setIsAuth }) => {
@@ -74,9 +74,9 @@ const CustomHeader: React.FC<Props> = ({ user, setIsAuth }) => {
             EasyTeX
           </div>
         </div>
-        <div style={{ alignItems: 'center' }}>
+        <div style={{ alignItems: 'center', display: 'flex' }}>
           <PlusCircleOutlined
-            style={{ fontSize: '20px' }}
+            style={{ fontSize: '25px' }}
             onClick={handleClickCreateNewNote}
           />
         </div>
@@ -95,7 +95,9 @@ const CustomHeader: React.FC<Props> = ({ user, setIsAuth }) => {
                 <UserOutlined style={{ fontSize: '20px' }} />
               </div>
               <div>
-                <div style={{ fontSize: '20px' }}>{user.email}</div>
+                <div style={{ fontSize: '20px', paddingBottom: '3px' }}>
+                  {user.email}
+                </div>
               </div>
               {/* <div id="coordinates-button"> */}
               {/* <ExportOutlined style={{ fontSize: '20px' }} /> */}
