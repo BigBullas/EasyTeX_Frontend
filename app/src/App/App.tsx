@@ -27,7 +27,7 @@ const App: React.FC = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState<boolean | undefined>(undefined);
   const [isFirstAuth, setIsFirstAuth] = useState(false);
 
   const [notification, setNotification] = useState<Notification | undefined>(
@@ -85,7 +85,7 @@ const App: React.FC = () => {
     if (isAuth) {
       console.log('setUser: ', isAuth);
       requestUser();
-    } else {
+    } else if (isAuth === false) {
       console.log('setUser: undefined');
       requestLogout();
     }
