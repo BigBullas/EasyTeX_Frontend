@@ -217,7 +217,7 @@ const CustomMenu: React.FC<Props> = ({
 
   const requestForNotesOverview = async () => {
     try {
-      const response = await api.notes.overviewList();
+      const response = await api.notes.overviewList({ withCredentials: true });
 
       // console.log('response.data.notes: ', response.data.notes);
 

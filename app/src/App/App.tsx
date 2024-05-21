@@ -1,231 +1,128 @@
-import styles from './App.module.scss';
+// import styles from './App.module.scss';
 import React, { useEffect, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { Layout, Flex, message } from 'antd';
-import { Resizable } from 're-resizable';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+// import { Layout, Flex, message } from 'antd';
+// import { Resizable } from 're-resizable';
 // import { api } from './../api';
 
-const { Sider, Content } = Layout;
+// const { Sider, Content } = Layout;
 
-import CustomMenu from '../components/CustomMenu';
-import Search from 'antd/es/input/Search';
-import CustomHeader from '../components/CustomHeader';
-import { Note, Snippet } from '../api/Api';
-import EditorPage from '../pages/EditorPage';
-import CreationPage from '../pages/CreationPage';
-import CustomFindContainer from '../components/CustomFindContainer';
+// import CustomMenu from '../components/CustomMenu';
+// import Search from 'antd/es/input/Search';
+// import CustomHeader from '../components/CustomHeader';
+// import { Note, Snippet } from '../api/Api';
+// import EditorPage from '../pages/EditorPage';
+// import CreationPage from '../pages/CreationPage';
+// import CustomFindContainer from '../components/CustomFindContainer';
 import { api } from '../api';
-import HeaderInEditorPage from '../components/HeaderInEditorPage';
+// import HeaderInEditorPage from '../components/HeaderInEditorPage';
+import AuthPage from '../pages/AuthPage';
+import MainPage from '../pages/MainPage';
+import { Notification, User } from '../types';
+import Lending from '../pages/Lending';
+import { message } from 'antd';
 // import CustomBreadcrumb from '../components/CustomBreadcrumb';
 
 const App: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const [isUpdateNoteAndDirList, setIsUpdateNoteAndDirList] =
-  const [isUpdateNoteAndDirList, setIsUpdateNoteAndDirList] =
-    React.useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
-  // const [noteList, setNotelist] = React.useState<NotePreview[]>([]);
-  const [currentNote, setCurrentNote] = useState<Note>({});
-  const [findValue, setFindValue] = useState<string>('');
-  const [snippets, setSnippets] = useState<Snippet[]>([]);
+  const navigate = useNavigate();
 
-  const handleChangeFindValue = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setFindValue(event.target.value);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [isAuth, setIsAuth] = useState(false);
+  const [isFirstAuth, setIsFirstAuth] = useState(false);
+
+  const [notification, setNotification] = useState<Notification | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    console.log('notification: ', notification);
+    if (notification == undefined) {
+      return;
+    }
+    message[notification.type](notification.data);
+  }, [notification]);
+
+  const requestUser = async () => {
+    const response = await api.auth.getAuth({ withCredentials: true });
+    if (response.status === 200) {
+      console.log('get user: ', response.data);
+      setUser(response.data);
+    } else {
+      if (response.status === 401) {
+        console.log('get user: 401');
+        navigate('/home');
+        setNotification({
+          type: 'error',
+          data: 'Истекла сессия пользователя, авторизируйтесь повторно',
+        });
+      } else {
+        console.log('get user: 500');
+        setNotification({
+          type: 'error',
+          data: 'Потеряна связь с сервером',
+        });
+      }
+    }
   };
 
-  const handleEventFindValue = (newValue: string) => {
-    setFindValue(newValue);
-  };
-
-  const requestSnippets = async () => {
-    const response = await api.snippets.snippetsList();
-    setSnippets(response.data.snippets);
+  const requestLogout = async () => {
+    const response = await api.auth.logoutDelete();
+    if (response.status === 200) {
+      setUser(undefined);
+    } else if (response.status === 500) {
+      console.log('get user: 500');
+      setNotification({
+        type: 'error',
+        data: 'Потеряна связь с сервером',
+      });
+    } else {
+      console.log('Error in logout: ', response);
+    }
   };
 
   useEffect(() => {
-    requestSnippets();
-  }, []);
+    console.log('isAuth: ', isAuth);
+    if (isAuth) {
+      console.log('setUser: ', isAuth);
+      requestUser();
+    } else {
+      console.log('setUser: undefined');
+      requestLogout();
+    }
+  }, [isAuth]);
 
   return (
     <>
       <Routes>
-        <Route path="/home" element={<h1>Страница описания</h1>} />
+        <Route path="/home" element={<Lending isAuth={isAuth} />} />
+        <Route
+          path="/auth"
+          element={
+            <AuthPage
+              setIsAuthUser={setIsAuth}
+              setIsFirstAuth={setIsFirstAuth}
+            />
+          }
+        />
+        <Route
+          path="/reg"
+          element={
+            <AuthPage
+              setIsAuthUser={setIsAuth}
+              setIsFirstAuth={setIsFirstAuth}
+            />
+          }
+        />
         <Route
           path="/*"
           element={
-            <Flex
-              gap="middle"
-              wrap="wrap"
-              style={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <Layout style={layoutStyle}>
-                {/* <Routes>
-                  <Route
-                    path="/note/:id"
-                    element={
-                      <CustomHeader
-                        isFullHeader
-                        currentNote={currentNote}
-                        messageApi={messageApi}
-                        setCurrentNote={setCurrentNote}
-                        isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                        setIsUpdateNoteAndDirList={setIsUpdateNoteAndDirList}
-                      ></CustomHeader>
-                    }
-                  />
-                  <Route
-                    path="/create_note"
-                    element={
-                      <CustomHeader
-                        isFullHeader
-                        currentNote={currentNote}
-                        messageApi={messageApi}
-                        setCurrentNote={setCurrentNote}
-                        isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                        setIsUpdateNoteAndDirList={setIsUpdateNoteAndDirList}
-                      ></CustomHeader>
-                    }
-                  />
-                  <Route
-                    path="/*"
-                    element={
-                      <CustomHeader
-                        isFullHeader={false}
-                        currentNote={currentNote}
-                        messageApi={messageApi}
-                        setCurrentNote={setCurrentNote}
-                        isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                        setIsUpdateNoteAndDirList={setIsUpdateNoteAndDirList}
-                      ></CustomHeader>
-                    }
-                  />
-                </Routes> */}
-                <CustomHeader />
-                <Layout style={{ flexGrow: '1' }}>
-                  <Resizable
-                    maxWidth={'650px'}
-                    minWidth={'150px'}
-                    defaultSize={{
-                      width: '260px',
-                      height: '100%',
-                    }}
-                  >
-                    <Sider className={styles.siderStyle} width={'100%'}>
-                      {/* вынести в отдельный компонент */}
-                      <Search
-                        placeholder="Поиск"
-                        allowClear
-                        onChange={handleChangeFindValue}
-                        onSearch={handleEventFindValue}
-                        value={findValue}
-                        style={{
-                          width: '80%',
-                          margin: '1em 0',
-                          paddingLeft: '24px',
-                        }}
-                      />
-                      {!findValue ? (
-                        // поменять название на FolderMenu или меню иерархии
-                        <CustomMenu
-                          currentNote={currentNote}
-                          setCurrentNote={setCurrentNote}
-                          isUpdate={isUpdateNoteAndDirList}
-                          setIsUpdate={setIsUpdateNoteAndDirList}
-                        ></CustomMenu>
-                      ) : (
-                        <CustomFindContainer
-                          findValue={findValue}
-                        ></CustomFindContainer>
-                      )}
-                    </Sider>
-                  </Resizable>
-
-                  <Content style={contentStyle}>
-                    {/* <CustomBreadcrumb /> */}
-                    <Routes>
-                      <Route
-                        path="/"
-                        element={
-                          // TODO: здесь будет новый компонент главной страницы
-                          <EditorPage
-                            isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                            setIsUpdateNoteAndDirList={
-                              setIsUpdateNoteAndDirList
-                            }
-                            note={currentNote}
-                            setNote={setCurrentNote}
-                            snippets={snippets}
-                            setSnippets={setSnippets}
-                            contextHolder={contextHolder}
-                          ></EditorPage>
-                        }
-                      />
-                      <Route
-                        path="/create_note/"
-                        element={
-                          <CreationPage
-                            isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                            setIsUpdateNoteAndDirList={
-                              setIsUpdateNoteAndDirList
-                            }
-                            note={currentNote}
-                            setNote={setCurrentNote}
-                            contextHolder={contextHolder}
-                          ></CreationPage>
-                        }
-                      ></Route>
-                      <Route
-                        path="/note/:id"
-                        element={
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                            }}
-                          >
-                            <HeaderInEditorPage
-                              isFullHeader={false}
-                              currentNote={currentNote}
-                              messageApi={messageApi}
-                              setCurrentNote={setCurrentNote}
-                              isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                              setIsUpdateNoteAndDirList={
-                                setIsUpdateNoteAndDirList
-                              }
-                            />
-                            <EditorPage
-                              isUpdateNoteAndDirList={isUpdateNoteAndDirList}
-                              setIsUpdateNoteAndDirList={
-                                setIsUpdateNoteAndDirList
-                              }
-                              note={currentNote}
-                              setNote={setCurrentNote}
-                              snippets={snippets}
-                              setSnippets={setSnippets}
-                              contextHolder={contextHolder}
-                            ></EditorPage>
-                          </div>
-                        }
-                      />
-                      <Route
-                        path="/dir/:id"
-                        element={
-                          <h1>
-                            Страница списка папок и файлов определённой папки
-                          </h1>
-                        }
-                      />
-                    </Routes>
-                  </Content>
-                </Layout>
-              </Layout>
-            </Flex>
+            <MainPage
+              isAuth={isAuth}
+              isFirstAuth={isFirstAuth}
+              setIsAuth={setIsAuth}
+              user={user}
+              setUser={setUser}
+            />
           }
         />
       </Routes>
@@ -234,27 +131,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-// TODO: закинуть в scss файл
-
-const contentStyle: React.CSSProperties = {
-  textAlign: 'center',
-  minHeight: 120,
-  lineHeight: '100%',
-  color: 'black',
-  // backgroundColor: '#f0f2f5',
-  margin: '1.5em 5em',
-};
-
-// const siderStyle: React.CSSProperties = {
-//   height: '100%',
-//   textAlign: 'center',
-//   color: '#black',
-//   backgroundColor: '#FFFFFF',
-// };
-
-const layoutStyle = {
-  overflow: 'hidden',
-  width: '100%',
-  maxWidth: '100%',
-};

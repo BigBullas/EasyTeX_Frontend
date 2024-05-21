@@ -61,6 +61,75 @@ export interface NoteSearchItem {
   nameHighlight: string[];
 }
 
+export interface LoginRequest {
+  /**
+   * Электронная почта
+   * @example "default@default.ru"
+   */
+  email: string;
+  /**
+   * Пароль
+   * @example "secret"
+   */
+  password: string;
+}
+
+export interface RegisterRequest {
+  /**
+   * Электронная почта
+   * @example "default@default.ru"
+   */
+  email: string;
+  /**
+   * Пароль
+   * @example "secret"
+   */
+  password: string;
+  /**
+   * имя пользователя
+   * @example "name"
+   */
+  name?: string;
+  /**
+   * фамилия пользователя
+   * @example "surname"
+   */
+  surname?: string;
+  /**
+   * ник пользователя
+   * @example "username"
+   */
+  username: string;
+}
+
+export interface UserInfo {
+  /**
+   * Электронная почта
+   * @example "default@default.ru"
+   */
+  email: string;
+  /**
+   * Пароль
+   * @example "secret"
+   */
+  password: string;
+  /**
+   * имя пользователя
+   * @example "name"
+   */
+  name?: string;
+  /**
+   * фамилия пользователя
+   * @example "surname"
+   */
+  surname?: string;
+  /**
+   * ник пользователя
+   * @example "username"
+   */
+  username: string;
+}
+
 export interface SearchRequest {
   /**
    * Поисковый запрос
@@ -389,12 +458,14 @@ export class Api<
      * @name NotesCreate
      * @summary Создание заметки
      * @request POST:/notes
+     * @secure
      */
     notesCreate: (data: Note, params: RequestParams = {}) =>
       this.request<NoteCreationResponse, Error>({
         path: `/notes`,
         method: 'POST',
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: 'json',
         ...params,
@@ -407,11 +478,13 @@ export class Api<
      * @name OverviewList
      * @summary Получение заметок для отображения структуры
      * @request GET:/notes/overview
+     * @secure
      */
     overviewList: (params: RequestParams = {}) =>
       this.request<NotesOverview, Error>({
         path: `/notes/overview`,
         method: 'GET',
+        secure: true,
         format: 'json',
         ...params,
       }),
@@ -423,11 +496,13 @@ export class Api<
      * @name NotesDetail
      * @summary Получение заметки по ID
      * @request GET:/notes/{noteId}
+     * @secure
      */
     notesDetail: (noteId: number, params: RequestParams = {}) =>
       this.request<Note, Error>({
         path: `/notes/${noteId}`,
         method: 'GET',
+        secure: true,
         format: 'json',
         ...params,
       }),
@@ -439,12 +514,14 @@ export class Api<
      * @name NotesUpdate
      * @summary Обновление заметки по ID
      * @request PUT:/notes/{noteId}
+     * @secure
      */
     notesUpdate: (noteId: number, data: Note, params: RequestParams = {}) =>
       this.request<void, Error>({
         path: `/notes/${noteId}`,
         method: 'PUT',
         body: data,
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -456,11 +533,13 @@ export class Api<
      * @name NotesDelete
      * @summary Удаление заметки по ID
      * @request DELETE:/notes/{noteId}
+     * @secure
      */
     notesDelete: (noteId: number, params: RequestParams = {}) =>
       this.request<void, Error>({
         path: `/notes/${noteId}`,
         method: 'DELETE',
+        secure: true,
         ...params,
       }),
 
@@ -471,11 +550,13 @@ export class Api<
      * @name DownloadMdDetail
      * @summary Получение заметки в виде md файла
      * @request GET:/notes/{noteId}/download/md
+     * @secure
      */
     downloadMdDetail: (noteId: number, params: RequestParams = {}) =>
       this.request<File, Error>({
         path: `/notes/${noteId}/download/md`,
         method: 'GET',
+        secure: true,
         ...params,
       }),
 
@@ -486,11 +567,13 @@ export class Api<
      * @name DownloadPdfDetail
      * @summary Получение заметки в виде pdf файла
      * @request GET:/notes/{noteId}/download/pdf
+     * @secure
      */
     downloadPdfDetail: (noteId: number, params: RequestParams = {}) =>
       this.request<File, Error>({
         path: `/notes/${noteId}/download/pdf`,
         method: 'GET',
+        secure: true,
         ...params,
       }),
 
@@ -501,12 +584,14 @@ export class Api<
      * @name SearchCreate
      * @summary Поиск заметок
      * @request POST:/notes/search
+     * @secure
      */
     searchCreate: (data: SearchRequest, params: RequestParams = {}) =>
       this.request<NoteSearchResponse, Error>({
         path: `/notes/search`,
         method: 'POST',
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: 'json',
         ...params,
@@ -520,12 +605,14 @@ export class Api<
      * @name DirsCreate
      * @summary Создание папки
      * @request POST:/dirs
+     * @secure
      */
     dirsCreate: (data: Dir, params: RequestParams = {}) =>
-      this.request<DirCreationResponse, any>({
+      this.request<DirCreationResponse, Error>({
         path: `/dirs`,
         method: 'POST',
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: 'json',
         ...params,
@@ -745,8 +832,108 @@ export class Api<
      * @request GET:/snippets
      */
     snippetsList: (params: RequestParams = {}) =>
-      this.request<GetSnippetsResponse, Error>({
+      this.request<
+        {
+          snippets: Snippet[];
+        },
+        Error
+      >({
         path: `/snippets`,
+        method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags snippets
+     * @name SearchCreate
+     * @summary Поиск сниппетов
+     * @request POST:/snippets/search
+     */
+    searchCreate: (data: SearchRequest, params: RequestParams = {}) =>
+      this.request<
+        {
+          items?: Snippet[];
+        },
+        Error
+      >({
+        path: `/snippets/search`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+  };
+  auth = {
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name LoginCreate
+     * @summary Авторизация пользователя
+     * @request POST:/auth/login
+     */
+    loginCreate: (data: LoginRequest, params: RequestParams = {}) =>
+      this.request<void, Error>({
+        path: `/auth/login`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name RegisterUpdate
+     * @summary Регистрация пользователя
+     * @request PUT:/auth/register
+     */
+    registerUpdate: (data: RegisterRequest, params: RequestParams = {}) =>
+      this.request<
+        {
+          items?: Snippet[];
+        },
+        Error
+      >({
+        path: `/auth/register`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name LogoutDelete
+     * @summary Удаление текущей авторизационной сессии
+     * @request DELETE:/auth/logout
+     */
+    logoutDelete: (params: RequestParams = {}) =>
+      this.request<void, Error>({
+        path: `/auth/logout`,
+        method: 'DELETE',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags auth
+     * @name GetAuth
+     * @summary Получение информации о текущем пользователе
+     * @request GET:/auth/me
+     */
+    getAuth: (params: RequestParams = {}) =>
+      this.request<UserInfo, Error>({
+        path: `/auth/me`,
         method: 'GET',
         format: 'json',
         ...params,

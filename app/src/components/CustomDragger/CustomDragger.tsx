@@ -29,7 +29,7 @@ const CustomDragger: React.FC<Props> = ({
     name: isImage ? 'images' : 'data',
     multiple: false,
     accept: isImage ? 'image/*' : '.md,.pdf',
-    maxCount: 1,
+    // maxCount: 1,
     customRequest: async (info) => {
       const formData = new FormData();
       isImage

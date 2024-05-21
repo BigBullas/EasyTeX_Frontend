@@ -1,19 +1,20 @@
 import React from 'react';
-import { Layout } from 'antd';
+import { Dropdown, Layout, MenuProps } from 'antd';
 // import { api } from './../api';
 
 const { Header } = Layout;
 import styles from './CustomHeader.module.scss';
 import {
-  DeleteOutlined,
-  ExportOutlined,
-  FileImageOutlined,
+  LogoutOutlined,
   MenuUnfoldOutlined,
   PlusCircleOutlined,
+  SettingOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 // import { Note } from '../../api/Api';
 // import { MessageInstance } from 'antd/es/message/interface';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../../types';
 
 console.log(styles);
 
@@ -26,7 +27,12 @@ console.log(styles);
 //   messageApi: MessageInstance;
 // };
 
-const CustomHeader: React.FC = () => {
+type Props = {
+  user: User | undefined;
+  setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const CustomHeader: React.FC<Props> = ({ user, setIsAuth }) => {
   const navigate = useNavigate();
 
   const handleClickCreateNewNote = (event: React.MouseEvent) => {
@@ -38,6 +44,24 @@ const CustomHeader: React.FC = () => {
     event.preventDefault();
     navigate('/');
   };
+
+  const items: MenuProps['items'] = [
+    {
+      key: 'settings',
+      disabled: true,
+      label: <p>Настройки</p>,
+      icon: <SettingOutlined />,
+    },
+    {
+      key: 'exit',
+      label: 'Выйти',
+      danger: true,
+      icon: <LogoutOutlined />,
+      onClick: () => {
+        setIsAuth(false);
+      },
+    },
+  ];
 
   return (
     <Header className={styles.headerStyle}>
@@ -58,23 +82,36 @@ const CustomHeader: React.FC = () => {
         </div>
       </div>
       <div className={styles.headerRight}>
-        <div className={styles.iconContainer}>
+        {user ? (
+          <Dropdown
+            menu={{ items }}
+            placement="bottomRight"
+            trigger={['click']}
+            arrow
+          >
+            {/* <Button>bottomRight</Button> */}
+            <div className={styles.iconContainer}>
+              <div>
+                <UserOutlined style={{ fontSize: '20px' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: '20px' }}>{user.email}</div>
+              </div>
+              {/* <div id="coordinates-button"> */}
+              {/* <ExportOutlined style={{ fontSize: '20px' }} /> */}
+              {/* </div> */}
+            </div>
+          </Dropdown>
+        ) : (
           <div>
-            <FileImageOutlined style={{ fontSize: '20px' }} />
+            {/* <div className={styles.buttonContainer}>
+          <Button type="default" onClick={() => {}}>
+            Поделиться
+          </Button>
+          <Button type="primary">Сохранить</Button>
+        </div> */}
           </div>
-          <div>
-            <DeleteOutlined style={{ fontSize: '20px' }} />
-          </div>
-          <div id="coordinates-button">
-            <ExportOutlined style={{ fontSize: '20px' }} />
-          </div>
-        </div>
-        {/* <div className={styles.buttonContainer}>
-            <Button type="default" onClick={() => {}}>
-              Поделиться
-            </Button>
-            <Button type="primary">Сохранить</Button>
-          </div> */}
+        )}
       </div>
     </Header>
   );

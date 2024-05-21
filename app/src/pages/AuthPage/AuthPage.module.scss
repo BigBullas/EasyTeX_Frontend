@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.authContainer {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+#gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: background 1s ease;
+  // z-index: -1;
+}
+
+.authGradient {
+  background: linear-gradient(to top right, #1f1e1e, #6d7fe2);
+}
+
+.regGradient {
+  background: linear-gradient(to bottom left, #1f1e1e, #6d7fe2);
+}
+
+.animateGradient {
+  animation: gradientSwitch 1s forwards;
+}
+
+.animateGradientBack {
+  animation: gradientSwitchBack 1s forwards;
+}
+
+@keyframes gradientSwitch {
+  0% {
+    background: linear-gradient(to bottom left, #6d7fe2, #1f1e1e);
+  }
+  // 50% {
+  //   background: linear-gradient(to top left, #6d7fe2, #1f1e1e);
+  // }
+  100% {
+    background: linear-gradient(to top right, #6d7fe2, #1f1e1e);
+  }
+}
+
+@keyframes gradientSwitchBack {
+  0% {
+    background: linear-gradient(to top right, #6d7fe2, #1f1e1e);
+  }
+  // 50% {
+  //   background: linear-gradient(to bottom right, #6d7fe2, #1f1e1e);
+  // }
+  100% {
+    background: linear-gradient(to bottom left, #6d7fe2, #1f1e1e);
+  }
+}
+
+.login_form_button {
+  margin-right: 1em;
+}
