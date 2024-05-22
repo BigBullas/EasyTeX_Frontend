@@ -76,7 +76,7 @@ const EditorPage: React.FC<Props> = ({
     if (hasCreateNote) {
       currentNoteId = -1;
     } else {
-      currentNoteId = 528;
+      currentNoteId = 556;
     }
   }
 
@@ -516,7 +516,7 @@ const EditorPage: React.FC<Props> = ({
 
         <input
           type="file"
-          accept=".jpeg,.png,.svg"
+          accept=".jpeg,.png,.svg,.jpg"
           ref={inputForContextMenuFile}
           style={{ display: 'none' }}
           onChange={handleChangeInputForContextMenu}
