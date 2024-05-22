@@ -6,7 +6,7 @@ const { Header } = Layout;
 import styles from './CustomHeader.module.scss';
 import {
   LogoutOutlined,
-  MenuUnfoldOutlined,
+  // MenuUnfoldOutlined,
   PlusCircleOutlined,
   SettingOutlined,
   UserOutlined,
@@ -67,9 +67,9 @@ const CustomHeader: React.FC<Props> = ({ user, setIsAuth }) => {
     <Header className={styles.headerStyle}>
       <div className={styles.headerLeft}>
         <div className={styles.burgerAndLogo}>
-          <div style={{ alignItems: 'center' }}>
+          {/* <div style={{ alignItems: 'center' }}>
             <MenuUnfoldOutlined style={{ fontSize: '20px' }} />
-          </div>
+          </div> */}
           <div className={styles.logo} onClick={handleClickMainPage}>
             EasyTeX
           </div>

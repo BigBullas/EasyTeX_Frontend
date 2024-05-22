@@ -102,6 +102,22 @@ export interface RegisterRequest {
   username: string;
 }
 
+export interface ImagePreprocessRequest {
+  /** @format binary */
+  image: File;
+  /** @example 1 */
+  threshold: number;
+  /** @example "flase" */
+  apply_fft: boolean;
+}
+
+export interface ImagePreprocessResponse {
+  /** @format binary */
+  image: File;
+  /** @example 1 */
+  threshold: number;
+}
+
 export interface UserInfo {
   /**
    * Электронная почта
@@ -863,6 +879,35 @@ export class Api<
         method: 'POST',
         body: data,
         type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+  };
+  preprocessor = {
+    /**
+     * No description
+     *
+     * @tags preprocessor
+     * @name PreprocessorCreate
+     * @summary Обработка входящего изображения
+     * @request POST:/preprocessor
+     */
+    preprocessorCreate: (
+      data: {
+        /** @format binary */
+        image?: File;
+        /** Число в виде строки от 0 до 255 */
+        threshold?: string;
+        /** True или False */
+        apply_fft?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ImagePreprocessResponse, any>({
+        path: `/preprocessor`,
+        method: 'POST',
+        body: data,
+        type: ContentType.FormData,
         format: 'json',
         ...params,
       }),
